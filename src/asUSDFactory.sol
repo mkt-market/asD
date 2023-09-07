@@ -9,7 +9,7 @@ contract asUSDFactory is Ownable2Step {
     /*//////////////////////////////////////////////////////////////
                                  STATE
     //////////////////////////////////////////////////////////////*/
-    address public note;
+    address public cNote;
 
     /*//////////////////////////////////////////////////////////////
                                  EVENTS
@@ -17,9 +17,9 @@ contract asUSDFactory is Ownable2Step {
     event CreatedToken(address token, string symbol, string name, address creator);
     
     /// @notice Initiates CSR on main- and testnet
-    /// @param _note Address of the NOTE token
-    constructor(address _note) {
-        note = _note;
+    /// @param _cNote Address of the cNOTE token
+    constructor(address _cNote) {
+        cNote = _cNote;
         if (block.chainid == 7700 || block.chainid == 7701) {
             // Register CSR on Canto main- and testnet
             Turnstile turnstile = Turnstile(0xEcf044C5B4b867CFda001101c617eCd347095B44);
