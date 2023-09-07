@@ -1,12 +1,12 @@
 {
-  "name": "canto-pfp-protocol",
+  "name": "asUSD",
   "author": "mkt.market",
   "version": "1.0.0",
-  "description": "Canto PFP Protocol",
-  "homepage": "https://github.com/mkt-market/canto-pfp-protocol#readme",
+  "description": "Application-specific USD",
+  "homepage": "https://github.com/mkt-market/asusd#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mkt-market/canto-pfp-protocol.git"
+    "url": "git+https://github.com/mkt-market/asusd.git"
   },
   "scripts": {
     "prettier": "prettier --write 'src/**/*.sol'",
