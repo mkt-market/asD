@@ -11,6 +11,9 @@ contract asDFactory is Ownable2Step {
     //////////////////////////////////////////////////////////////*/
     address public immutable cNote;
 
+    /// @notice Stores the addresses of all created tokens, allowing third-party contracts to check if an address is a legit token
+    mapping(address => bool) public isAsD;
+
     /*//////////////////////////////////////////////////////////////
                                  EVENTS
     //////////////////////////////////////////////////////////////*/
@@ -36,6 +39,7 @@ contract asDFactory is Ownable2Step {
 
     function create(string memory _symbol, string memory _name) external {
         asD createdToken = new asD(_symbol, _name, msg.sender, cNote, owner());
+        isAsD[address(createdToken)] = true;
         emit CreatedToken(address(createdToken), _symbol, _name, msg.sender);
     }
 }
