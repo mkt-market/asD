@@ -1,55 +1,8 @@
-# Forge Template
+# Application Specific Dollar
+Allows the permissionless creation of a stablecoin (asD) that is always backed 1:1 to NOTE. The NOTE is added to the Canto Lending Market and the creator of a coin can withdraw the carry (i.e., the accrued interest) at any time. However, the contract ensures that it is always possible to burn asUSD for NOTE at a 1:1 rate.
 
-A template for quickly getting started with forge
+## Background Information
 
-## Getting Started
-
-```
-mkdir my-project
-cd my-project
-forge init --template https://github.com/FrankieIsLost/forge-template
-git submodule update --init --recursive  ## initialize submodule dependencies
-npm install ## install development dependencies
-forge build
-forge test
-```
-
-If OpenZeppelin libraries are required:
-```
-forge install OpenZeppelin/openzeppelin-contracts
-```
-And add the following line to `remappings.txt`:
-```
-openzeppelin/=lib/openzeppelin-contracts/contracts/
-```
-
-## Features
-
-### Testing Utilities
-
-Includes a `Utilities.sol` contract with common testing methods (like creating users with an initial balance), as well as various other utility contracts.
-
-### Preinstalled dependencies
-
-`ds-test` for testing, `forge-std` for better cheatcode UX, and `solmate` for optimized contract implementations.  
-
-### Linting
-
-Pre-configured `solhint` and `prettier-plugin-solidity`. Can be run by
-
-```
-npm run solhint
-npm run prettier
-```
-
-### CI with Github Actions
-
-Automatically run linting and tests on pull requests.
-
-### Default Configuration
-
-Including `.gitignore`, `.vscode`, `remappings.txt`
-
-## Acknowledgement
-
-Inspired by great dapptools templates like https://github.com/gakonst/forge-template, https://github.com/gakonst/dapptools-template and https://github.com/transmissions11/dapptools-template
+- NOTE: https://docs.canto.io/overview/canto-unit-of-account-usdnote
+- Canto Lending Market: https://docs.canto.io/overview/canto-lending-market-clm
+- Compound cTOKEN Documentation: https://docs.compound.finance/v2/ctokens 
