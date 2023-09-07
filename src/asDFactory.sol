@@ -17,12 +17,7 @@ contract asDFactory is Ownable2Step {
     /*//////////////////////////////////////////////////////////////
                                  EVENTS
     //////////////////////////////////////////////////////////////*/
-    event CreatedToken(
-        address token,
-        string symbol,
-        string name,
-        address creator
-    );
+    event CreatedToken(address token, string symbol, string name, address creator);
 
     /// @notice Initiates CSR on main- and testnet
     /// @param _cNote Address of the cNOTE token
@@ -30,9 +25,7 @@ contract asDFactory is Ownable2Step {
         cNote = _cNote;
         if (block.chainid == 7700 || block.chainid == 7701) {
             // Register CSR on Canto main- and testnet
-            Turnstile turnstile = Turnstile(
-                0xEcf044C5B4b867CFda001101c617eCd347095B44
-            );
+            Turnstile turnstile = Turnstile(0xEcf044C5B4b867CFda001101c617eCd347095B44);
             turnstile.register(tx.origin);
         }
     }

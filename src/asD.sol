@@ -36,9 +36,7 @@ contract asD is ERC20, Ownable2Step {
         cNote = _cNote;
         if (block.chainid == 7700 || block.chainid == 7701) {
             // Register CSR on Canto main- and testnet
-            Turnstile turnstile = Turnstile(
-                0xEcf044C5B4b867CFda001101c617eCd347095B44
-            );
+            Turnstile turnstile = Turnstile(0xEcf044C5B4b867CFda001101c617eCd347095B44);
             turnstile.register(_csrRecipient);
         }
     }
@@ -74,17 +72,12 @@ contract asD is ERC20, Ownable2Step {
     function withdrawCarry(uint256 _amount) external onlyOwner {
         uint256 exchangeRate = CTokenInterface(cNote).exchangeRateCurrent(); // Scaled by 1 * 10^(18 - 8 + Underlying Token Decimals), i.e. 10^(28) in our case
         // The amount of cNOTE the contract has to hold (based on the current exchange rate which is always increasing) such that it is always possible to receive 1 NOTE when burning 1 asD
-        uint256 cNoteRequiredForSupply = (totalSupply() * 1e28 + 1) /
-            exchangeRate; // _amount has 18 decimals, we scale it by 10^28 such that it still has 18 decimals after the division. + 1 such that the calculation rounds up
-        uint maximumWithdrawable = cNoteRequiredForSupply -
-            CTokenInterface(cNote).balanceOf(address(this));
+        uint256 cNoteRequiredForSupply = (totalSupply() * 1e28 + 1) / exchangeRate; // _amount has 18 decimals, we scale it by 10^28 such that it still has 18 decimals after the division. + 1 such that the calculation rounds up
+        uint256 maximumWithdrawable = cNoteRequiredForSupply - CTokenInterface(cNote).balanceOf(address(this));
         if (_amount == 0) {
             _amount = maximumWithdrawable;
         } else {
-            require(
-                _amount <= maximumWithdrawable,
-                "Too many tokens requested"
-            );
+            require(_amount <= maximumWithdrawable, "Too many tokens requested");
         }
         // Technically, _amount can still be 0 at this point, which would make the following two calls unnecessary.
         // But we do not handle this case specifically, as the only consequence is that the owner wastes a bit of gas when there is nothing to withdraw
