@@ -3,9 +3,9 @@ pragma solidity >=0.8.0;
 
 import {Turnstile} from "../interface/Turnstile.sol";
 import {Ownable2Step} from "@openzeppelin/contracts/access/Ownable2Step.sol";
-import {asUSD} from "./asUSD.sol";
+import {asD} from "./asD.sol";
 
-contract asUSDFactory is Ownable2Step {
+contract asDFactory is Ownable2Step {
     /*//////////////////////////////////////////////////////////////
                                  STATE
     //////////////////////////////////////////////////////////////*/
@@ -14,21 +14,28 @@ contract asUSDFactory is Ownable2Step {
     /*//////////////////////////////////////////////////////////////
                                  EVENTS
     //////////////////////////////////////////////////////////////*/
-    event CreatedToken(address token, string symbol, string name, address creator);
-    
+    event CreatedToken(
+        address token,
+        string symbol,
+        string name,
+        address creator
+    );
+
     /// @notice Initiates CSR on main- and testnet
     /// @param _cNote Address of the cNOTE token
     constructor(address _cNote) {
         cNote = _cNote;
         if (block.chainid == 7700 || block.chainid == 7701) {
             // Register CSR on Canto main- and testnet
-            Turnstile turnstile = Turnstile(0xEcf044C5B4b867CFda001101c617eCd347095B44);
+            Turnstile turnstile = Turnstile(
+                0xEcf044C5B4b867CFda001101c617eCd347095B44
+            );
             turnstile.register(tx.origin);
         }
     }
 
     function create(string memory _symbol, string memory _name) external {
-        asUSD createdToken = new asUSD(_symbol, _name, msg.sender, owner());
+        asD createdToken = new asD(_symbol, _name, msg.sender, owner());
         emit CreatedToken(address(createdToken), _symbol, _name, msg.sender);
     }
 }

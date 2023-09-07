@@ -1,12 +1,12 @@
 {
-  "name": "asUSD",
+  "name": "asD",
   "author": "mkt.market",
   "version": "1.0.0",
   "description": "Application-specific USD",
-  "homepage": "https://github.com/mkt-market/asusd#readme",
+  "homepage": "https://github.com/mkt-market/asD#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mkt-market/asusd.git"
+    "url": "git+https://github.com/mkt-market/asD.git"
   },
   "scripts": {
     "prettier": "prettier --write 'src/**/*.sol'",
