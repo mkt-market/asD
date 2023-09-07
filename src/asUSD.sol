@@ -3,7 +3,7 @@ pragma solidity >=0.8.0;
 
 import {Turnstile} from "../interface/Turnstile.sol";
 import {IasUSDFactory} from "../interface/IasUSDFactory.sol";
-import {CErc20Interface} from "../interface/clm/CTokenInterfaces.sol";
+import {CTokenInterface, CErc20Interface} from "../interface/clm/CTokenInterfaces.sol";
 import {Ownable2Step} from "@openzeppelin/contracts/access/Ownable2Step.sol";
 import {IERC20, ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
@@ -29,7 +29,7 @@ contract asUSD is ERC20, Ownable2Step {
         }
     }
 
-    /// @notice Mint amount of asUSD tokens
+    /// @notice Mint amount of asUSD tokens by providing NOTE. The NOTE:asUSD exchange rate is always 1:1 
     /// @param _amount Amount of tokens to mint
     /// @dev User needs to approve the asUSD contract for _amount of NOTE 
     function mint(uint256 _amount) external {
@@ -41,5 +41,16 @@ contract asUSD is ERC20, Ownable2Step {
         // Mint returns 0 on success: https://docs.compound.finance/v2/ctokens/#mint
         require(returnCode == 0, "Error when minting");
         _mint(msg.sender, _amount);
+    }
+
+    /// @notice Burn amount of asUSD tokens to get back NOTE. Like when minting, the NOTE:asUSD exchange rate is always 1:1
+    /// @param _amount Amount of tokens to burn
+    function burn(uint256 _amount) external {
+        CErc20Interface cNote = CErc20Interface(factory.note());
+        IERC20 note = IERC20(cNote.underlying());
+        uint256 returnCode = cNote.redeemUnderlying(_amount); // Request _amount of NOTE (the underlying of cNOTE)
+        require(returnCode == 0, "Error when redeeming"); // 0 on success: https://docs.compound.finance/v2/ctokens/#redeem-underlying
+        _burn(msg.sender, _amount);
+        SafeERC20.safeTransfer(note, msg.sender, _amount);
     }
 }
