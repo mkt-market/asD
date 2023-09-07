@@ -9,11 +9,13 @@ contract asUSD is ERC20, Ownable2Step {
     /*//////////////////////////////////////////////////////////////
                                  STATE
     //////////////////////////////////////////////////////////////*/
+    address public factory;
     
     /// @notice Initiates CSR on main- and testnet
     /// @param _csrRecipient Address that should receive CSR rewards
     constructor(string memory _name, string memory _symbol, address _owner, address _csrRecipient) ERC20(_name, _symbol) {
         _transferOwnership(_owner);
+        factory = msg.sender;
         if (block.chainid == 7700 || block.chainid == 7701) {
             // Register CSR on Canto main- and testnet
             Turnstile turnstile = Turnstile(0xEcf044C5B4b867CFda001101c617eCd347095B44);
