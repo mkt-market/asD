@@ -9,7 +9,7 @@ contract asDFactory is Ownable2Step {
     /*//////////////////////////////////////////////////////////////
                                  STATE
     //////////////////////////////////////////////////////////////*/
-    address public cNote;
+    address public immutable cNote;
 
     /*//////////////////////////////////////////////////////////////
                                  EVENTS
@@ -35,7 +35,7 @@ contract asDFactory is Ownable2Step {
     }
 
     function create(string memory _symbol, string memory _name) external {
-        asD createdToken = new asD(_symbol, _name, msg.sender, owner());
+        asD createdToken = new asD(_symbol, _name, msg.sender, cNote, owner());
         emit CreatedToken(address(createdToken), _symbol, _name, msg.sender);
     }
 }

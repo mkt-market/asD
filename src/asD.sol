@@ -12,7 +12,7 @@ contract asD is ERC20, Ownable2Step {
     /*//////////////////////////////////////////////////////////////
                                  STATE
     //////////////////////////////////////////////////////////////*/
-    IasDFactory public factory;
+    address public immutable cNote; // Reference to the cNOTE token
 
     /*//////////////////////////////////////////////////////////////
                                  EVENTS
@@ -23,15 +23,17 @@ contract asD is ERC20, Ownable2Step {
     /// @param _name Name of the token
     /// @param _symbol Symbol of the token
     /// @param _owner Initial owner of the vault/token
+    /// @param _cNote Address of the cNOTE token
     /// @param _csrRecipient Address that should receive CSR rewards
     constructor(
         string memory _name,
         string memory _symbol,
         address _owner,
+        address _cNote,
         address _csrRecipient
     ) ERC20(_name, _symbol) {
         _transferOwnership(_owner);
-        factory = IasDFactory(msg.sender);
+        cNote = _cNote;
         if (block.chainid == 7700 || block.chainid == 7701) {
             // Register CSR on Canto main- and testnet
             Turnstile turnstile = Turnstile(
@@ -45,11 +47,11 @@ contract asD is ERC20, Ownable2Step {
     /// @param _amount Amount of tokens to mint
     /// @dev User needs to approve the asD contract for _amount of NOTE
     function mint(uint256 _amount) external {
-        CErc20Interface cNote = CErc20Interface(factory.note());
-        IERC20 note = IERC20(cNote.underlying());
+        CErc20Interface cNoteToken = CErc20Interface(cNote);
+        IERC20 note = IERC20(cNoteToken.underlying());
         SafeERC20.safeTransferFrom(note, msg.sender, address(this), _amount);
-        SafeERC20.safeApprove(note, address(cNote), _amount);
-        uint256 returnCode = cNote.mint(_amount);
+        SafeERC20.safeApprove(note, cNote, _amount);
+        uint256 returnCode = cNoteToken.mint(_amount);
         // Mint returns 0 on success: https://docs.compound.finance/v2/ctokens/#mint
         require(returnCode == 0, "Error when minting");
         _mint(msg.sender, _amount);
@@ -58,9 +60,9 @@ contract asD is ERC20, Ownable2Step {
     /// @notice Burn amount of asD tokens to get back NOTE. Like when minting, the NOTE:asD exchange rate is always 1:1
     /// @param _amount Amount of tokens to burn
     function burn(uint256 _amount) external {
-        CErc20Interface cNote = CErc20Interface(factory.note());
-        IERC20 note = IERC20(cNote.underlying());
-        uint256 returnCode = cNote.redeemUnderlying(_amount); // Request _amount of NOTE (the underlying of cNOTE)
+        CErc20Interface cNoteToken = CErc20Interface(cNote);
+        IERC20 note = IERC20(cNoteToken.underlying());
+        uint256 returnCode = cNoteToken.redeemUnderlying(_amount); // Request _amount of NOTE (the underlying of cNOTE)
         require(returnCode == 0, "Error when redeeming"); // 0 on success: https://docs.compound.finance/v2/ctokens/#redeem-underlying
         _burn(msg.sender, _amount);
         SafeERC20.safeTransfer(note, msg.sender, _amount);
@@ -70,7 +72,6 @@ contract asD is ERC20, Ownable2Step {
     /// @param _amount Amount of cNOTE to withdraw. 0 for withdrawing the maximum possible amount
     /// @dev The function checks that the owner does not withdraw too much cNOTE, i.e. that a 1:1 NOTE:asD exchange rate can be maintained after the withdrawal
     function withdrawCarry(uint256 _amount) external onlyOwner {
-        address cNote = factory.note();
         uint256 exchangeRate = CTokenInterface(cNote).exchangeRateCurrent(); // Scaled by 1 * 10^(18 - 8 + Underlying Token Decimals), i.e. 10^(28) in our case
         // The amount of cNOTE the contract has to hold (based on the current exchange rate which is always increasing) such that it is always possible to receive 1 NOTE when burning 1 asD
         uint256 cNoteRequiredForSupply = (totalSupply() * 1e28 + 1) /
