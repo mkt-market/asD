@@ -44,4 +44,11 @@ contract asDFactoryTest is DSTest {
         assertEq(asdToken.symbol(), asDSymbol);
         assertEq(asdToken.name(), asDName);
     }
+
+      function test_token_owner() public {
+        address asDAddress = factory.create(asDName, asDSymbol);
+        assertNotEq(asDAddress, address(0));
+        asD asdToken = asD(asDAddress);
+        assertEq(asdToken.owner(), address(this));
+    }
 }

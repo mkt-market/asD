@@ -66,14 +66,13 @@ contract asD is ERC20, Ownable2Step {
         SafeERC20.safeTransfer(note, msg.sender, _amount);
     }
 
-    /// @notice Withdraw the cNOTE interest that accrued, only callable by the owner.
-    /// @param _amount Amount of cNOTE to withdraw. 0 for withdrawing the maximum possible amount
-    /// @dev The function checks that the owner does not withdraw too much cNOTE, i.e. that a 1:1 NOTE:asD exchange rate can be maintained after the withdrawal
+    /// @notice Withdraw the interest that accrued, only callable by the owner.
+    /// @param _amount Amount of NOTE to withdraw. 0 for withdrawing the maximum possible amount
+    /// @dev The function checks that the owner does not withdraw too much NOTE, i.e. that a 1:1 NOTE:asD exchange rate can be maintained after the withdrawal
     function withdrawCarry(uint256 _amount) external onlyOwner {
         uint256 exchangeRate = CTokenInterface(cNote).exchangeRateCurrent(); // Scaled by 1 * 10^(18 - 8 + Underlying Token Decimals), i.e. 10^(28) in our case
         // The amount of cNOTE the contract has to hold (based on the current exchange rate which is always increasing) such that it is always possible to receive 1 NOTE when burning 1 asD
-        uint256 cNoteRequiredForSupply = (totalSupply() * 1e28 + 1) / exchangeRate; // _amount has 18 decimals, we scale it by 10^28 such that it still has 18 decimals after the division. + 1 such that the calculation rounds up
-        uint256 maximumWithdrawable = cNoteRequiredForSupply - CTokenInterface(cNote).balanceOf(address(this));
+        uint256 maximumWithdrawable = CTokenInterface(cNote).balanceOf(address(this)) * exchangeRate / 1e28 - totalSupply();
         if (_amount == 0) {
             _amount = maximumWithdrawable;
         } else {
@@ -81,9 +80,10 @@ contract asD is ERC20, Ownable2Step {
         }
         // Technically, _amount can still be 0 at this point, which would make the following two calls unnecessary.
         // But we do not handle this case specifically, as the only consequence is that the owner wastes a bit of gas when there is nothing to withdraw
-        uint256 returnCode = CErc20Interface(cNote).redeem(_amount);
+        uint256 returnCode = CErc20Interface(cNote).redeemUnderlying(_amount);
         require(returnCode == 0, "Error when redeeming"); // 0 on success: https://docs.compound.finance/v2/ctokens/#redeem
-        SafeERC20.safeTransfer(IERC20(cNote), msg.sender, _amount);
+        IERC20 note = IERC20(CErc20Interface(cNote).underlying());
+        SafeERC20.safeTransfer(note, msg.sender, _amount);
         emit CarryWithdrawal(_amount);
     }
 }
