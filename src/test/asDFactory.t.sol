@@ -1,6 +1,7 @@
-import {asDFactory} from "../contracts/asDFactory.sol";
+// SPDX-License-Identifier: GPL-3.0-only
+pragma solidity >=0.8.0;
+import {asDFactory} from "../asDFactory.sol";
 import {DSTest} from "ds-test/test.sol";
-import {DSToken} from "ds-token/token.sol";
 
 contract MockERC20 is DSToken {
     constructor(string memory symbol, uint256 initialSupply) DSToken(symbol) public {
