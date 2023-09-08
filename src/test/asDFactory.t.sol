@@ -1,16 +1,16 @@
 // SPDX-License-Identifier: GPL-3.0-only
 pragma solidity >=0.8.0;
 import {asDFactory} from "../asDFactory.sol";
+import {asD} from "../asD.sol";
 import {DSTest} from "ds-test/test.sol";
+import {IERC20, ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
-contract MockERC20 is DSToken {
-    constructor(string memory symbol, uint256 initialSupply) DSToken(symbol) public {
-        mint(initialSupply);
+contract MockERC20 is ERC20 {
+    constructor(string memory symbol, string memory name) ERC20(symbol, name)  {
     }
 
-    function mint(uint256 amount) public {
-        _balances[msg.sender] += amount;
-        _supply += amount;
+    function mint(address to, uint256 amount) public {
+        _mint(to, amount);
     }
 }
 
@@ -18,22 +18,30 @@ contract asDFactoryTest is DSTest {
   
     asDFactory factory;
     MockERC20 cNOTE;
+    string asDName = "Test";
+    string asDSymbol = "TST";
 
     function setUp() public {
-      cNOTE = new MockERC20("cNOTE", 0);
-      factory = new asDFactory(cNOTE);
+      cNOTE = new MockERC20("cNOTE", "cNOTE");
+      factory = new asDFactory(address(cNOTE));
     }
 
     function test_create_asD() public {
-        address asD = factory.create_asD("Test", "TST", msg.sender, address(0x0));
-        assertTrue(asD != address(0x0));
+        address asDAddress = factory.create(asDName, asDName);
+        assertNotEq(asDAddress, address(0));
     }
 
-    function testFail_create_asD_with_empty_name() public {
-        factory.create_asD("", "TST", msg.sender, address(0x0));
+    function test_registry() public {
+        address asDAddress = factory.create(asDName, asDName);
+        assertNotEq(asDAddress, address(0));
+        assertTrue(factory.isAsD(asDAddress));
     }
 
-    function testFail_create_asD_with_empty_symbol() public {
-        factory.create_asD("Test", "", msg.sender, address(0x0));
+    function test_token_metadata() public {
+        address asDAddress = factory.create(asDName, asDSymbol);
+        assertNotEq(asDAddress, address(0));
+        asD asdToken = asD(asDAddress);
+        assertEq(asdToken.symbol(), asDSymbol);
+        assertEq(asdToken.name(), asDName);
     }
 }
