@@ -6,8 +6,7 @@ import {DSTest} from "ds-test/test.sol";
 import {IERC20, ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 contract MockERC20 is ERC20 {
-    constructor(string memory symbol, string memory name) ERC20(symbol, name)  {
-    }
+    constructor(string memory symbol, string memory name) ERC20(symbol, name) {}
 
     function mint(address to, uint256 amount) public {
         _mint(to, amount);
@@ -15,15 +14,14 @@ contract MockERC20 is ERC20 {
 }
 
 contract asDFactoryTest is DSTest {
-  
     asDFactory factory;
     MockERC20 cNOTE;
     string asDName = "Test";
     string asDSymbol = "TST";
 
     function setUp() public {
-      cNOTE = new MockERC20("cNOTE", "cNOTE");
-      factory = new asDFactory(address(cNOTE));
+        cNOTE = new MockERC20("cNOTE", "cNOTE");
+        factory = new asDFactory(address(cNOTE));
     }
 
     function test_create_asD() public {
@@ -45,7 +43,7 @@ contract asDFactoryTest is DSTest {
         assertEq(asdToken.name(), asDName);
     }
 
-      function test_token_owner() public {
+    function test_token_owner() public {
         address asDAddress = factory.create(asDName, asDSymbol);
         assertNotEq(asDAddress, address(0));
         asD asdToken = asD(asDAddress);

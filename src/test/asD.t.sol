@@ -6,8 +6,7 @@ import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol
 import "forge-std/Test.sol";
 
 contract MockERC20 is ERC20 {
-    constructor(string memory symbol, string memory name) ERC20(symbol, name)  {
-    }
+    constructor(string memory symbol, string memory name) ERC20(symbol, name) {}
 
     function mint(address to, uint256 amount) public {
         _mint(to, amount);
@@ -17,24 +16,29 @@ contract MockERC20 is ERC20 {
 contract MockCNOTE is MockERC20 {
     address public underlying;
     uint256 public exchangeRateCurrent = 1e28;
-    constructor(string memory symbol, string memory name, address _underlying) MockERC20(symbol, name)  {
+
+    constructor(
+        string memory symbol,
+        string memory name,
+        address _underlying
+    ) MockERC20(symbol, name) {
         underlying = _underlying;
     }
 
     function mint(uint256 amount) public returns (uint256 statusCode) {
         SafeERC20.safeTransferFrom(IERC20(underlying), msg.sender, address(this), amount);
-        _mint(msg.sender, amount * 1e28 / exchangeRateCurrent);
+        _mint(msg.sender, (amount * 1e28) / exchangeRateCurrent);
         statusCode = 0;
     }
 
     function redeemUnderlying(uint256 amount) public returns (uint256 statusCode) {
         SafeERC20.safeTransfer(IERC20(underlying), msg.sender, amount);
-        _burn(msg.sender, amount * exchangeRateCurrent / 1e28);
+        _burn(msg.sender, (amount * exchangeRateCurrent) / 1e28);
         statusCode = 0;
     }
 
     function redeem(uint256 amount) public returns (uint256 statusCode) {
-        SafeERC20.safeTransfer(IERC20(underlying), msg.sender, amount * exchangeRateCurrent / 1e28);
+        SafeERC20.safeTransfer(IERC20(underlying), msg.sender, (amount * exchangeRateCurrent) / 1e28);
         _burn(msg.sender, amount);
         statusCode = 0;
     }
@@ -45,7 +49,6 @@ contract MockCNOTE is MockERC20 {
 }
 
 contract asDFactory is Test {
-  
     asD asdToken;
     MockERC20 NOTE;
     MockCNOTE cNOTE;
@@ -55,11 +58,11 @@ contract asDFactory is Test {
     address alice;
 
     function setUp() public {
-      NOTE = new MockERC20("NOTE", "NOTE");
-      cNOTE = new MockCNOTE("cNOTE", "cNOTE", address(NOTE));
-      owner = makeAddr("owner");
-      alice = makeAddr("alice");
-      asdToken = new asD(asDName, asDSymbol, owner, address(cNOTE), owner);
+        NOTE = new MockERC20("NOTE", "NOTE");
+        cNOTE = new MockCNOTE("cNOTE", "cNOTE", address(NOTE));
+        owner = makeAddr("owner");
+        alice = makeAddr("alice");
+        asdToken = new asD(asDName, asDSymbol, owner, address(cNOTE), owner);
     }
 
     function testMint() public {
@@ -129,5 +132,4 @@ contract asDFactory is Test {
         vm.expectRevert("Ownable: caller is not the owner");
         asdToken.withdrawCarry(withdrawAmount);
     }
-    
 }

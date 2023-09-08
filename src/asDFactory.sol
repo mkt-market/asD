@@ -30,7 +30,7 @@ contract asDFactory is Ownable2Step {
         }
     }
 
-    function create(string memory _name, string memory _symbol) external returns (address)  {
+    function create(string memory _name, string memory _symbol) external returns (address) {
         asD createdToken = new asD(_name, _symbol, msg.sender, cNote, owner());
         isAsD[address(createdToken)] = true;
         emit CreatedToken(address(createdToken), _symbol, _name, msg.sender);

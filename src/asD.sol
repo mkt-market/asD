@@ -72,7 +72,9 @@ contract asD is ERC20, Ownable2Step {
     function withdrawCarry(uint256 _amount) external onlyOwner {
         uint256 exchangeRate = CTokenInterface(cNote).exchangeRateCurrent(); // Scaled by 1 * 10^(18 - 8 + Underlying Token Decimals), i.e. 10^(28) in our case
         // The amount of cNOTE the contract has to hold (based on the current exchange rate which is always increasing) such that it is always possible to receive 1 NOTE when burning 1 asD
-        uint256 maximumWithdrawable = CTokenInterface(cNote).balanceOf(address(this)) * exchangeRate / 1e28 - totalSupply();
+        uint256 maximumWithdrawable = (CTokenInterface(cNote).balanceOf(address(this)) * exchangeRate) /
+            1e28 -
+            totalSupply();
         if (_amount == 0) {
             _amount = maximumWithdrawable;
         } else {
