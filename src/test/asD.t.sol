@@ -15,7 +15,7 @@ contract MockERC20 is ERC20 {
 
 contract MockCNOTE is MockERC20 {
     address public underlying;
-    uint256 public exchangeRateCurrent = 1e28;
+    uint256 public exchangeRateCurrent = 1e18;
 
     constructor(
         string memory symbol,
@@ -27,24 +27,28 @@ contract MockCNOTE is MockERC20 {
 
     function mint(uint256 amount) public returns (uint256 statusCode) {
         SafeERC20.safeTransferFrom(IERC20(underlying), msg.sender, address(this), amount);
-        _mint(msg.sender, (amount * 1e28) / exchangeRateCurrent);
+        _mint(msg.sender, (amount * 1e18) / exchangeRateCurrent);
         statusCode = 0;
     }
 
     function redeemUnderlying(uint256 amount) public returns (uint256 statusCode) {
         SafeERC20.safeTransfer(IERC20(underlying), msg.sender, amount);
-        _burn(msg.sender, (amount * exchangeRateCurrent) / 1e28);
+        _burn(msg.sender, (amount * 1e18) / exchangeRateCurrent);
         statusCode = 0;
     }
 
     function redeem(uint256 amount) public returns (uint256 statusCode) {
-        SafeERC20.safeTransfer(IERC20(underlying), msg.sender, (amount * exchangeRateCurrent) / 1e28);
+        SafeERC20.safeTransfer(IERC20(underlying), msg.sender, (amount * exchangeRateCurrent) / 1e18);
         _burn(msg.sender, amount);
         statusCode = 0;
     }
 
     function setExchangeRate(uint256 _exchangeRate) public {
         exchangeRateCurrent = _exchangeRate;
+    }
+
+    function balanceOfUnderlying(address _address) public returns (uint256) {
+        return (balanceOf(_address) * exchangeRateCurrent) / 1e18;
     }
 }
 
@@ -90,7 +94,7 @@ contract asDFactory is Test {
 
     function testWithdrawCarry() public {
         testMint();
-        uint256 newExchangeRate = 1.1e28;
+        uint256 newExchangeRate = 1.1e18;
         cNOTE.setExchangeRate(newExchangeRate);
         uint256 initialBalance = NOTE.balanceOf(owner);
         uint256 asdSupply = asdToken.totalSupply();
@@ -103,7 +107,7 @@ contract asDFactory is Test {
 
     function testWithdrawCarryWithZeroAmount() public {
         testMint();
-        uint256 newExchangeRate = 1.1e28;
+        uint256 newExchangeRate = 1.1e18;
         cNOTE.setExchangeRate(newExchangeRate);
         uint256 initialBalance = NOTE.balanceOf(owner);
         uint256 asdSupply = asdToken.totalSupply();
@@ -116,7 +120,7 @@ contract asDFactory is Test {
 
     function testWithdrawCarryTooMuch() public {
         testMint();
-        uint256 newExchangeRate = 1.1e28;
+        uint256 newExchangeRate = 1.1e18;
         cNOTE.setExchangeRate(newExchangeRate);
         uint256 asdSupply = asdToken.totalSupply();
         // Should be able to withdraw 10%
