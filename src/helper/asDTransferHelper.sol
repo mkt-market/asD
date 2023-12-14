@@ -11,7 +11,6 @@ import {asDTransferCallback} from "./asDTransferCallback.sol";
 
 /// @notice Auxiliary contract that can be used for the integration of ASD with certain applications
 contract asDTransferHelper {
-
     IasDFactory public immutable asdFactory;
     address public immutable cNote;
 
@@ -25,7 +24,11 @@ contract asDTransferHelper {
         }
     }
 
-    function mintTo(uint256 _amount, address _recipient, address _asdToken) external {
+    function mintTo(
+        uint256 _amount,
+        address _recipient,
+        address _asdToken
+    ) external {
         require(asdFactory.isAsD(_asdToken), "Only asD tokens can be minted");
         CErc20Interface cNoteToken = CErc20Interface(cNote);
         IERC20 note = IERC20(cNoteToken.underlying());
@@ -36,7 +39,11 @@ contract asDTransferHelper {
         asDTransferCallback(_asdToken).receiveFrom(msg.sender, _amount, _asdToken);
     }
 
-    function burnTo(uint256 _amount, address _recipient, address _asdToken) external {
+    function burnTo(
+        uint256 _amount,
+        address _recipient,
+        address _asdToken
+    ) external {
         require(asdFactory.isAsD(_asdToken), "Only asD tokens can be burned");
         CErc20Interface cNoteToken = CErc20Interface(cNote);
         IERC20 note = IERC20(cNoteToken.underlying());
