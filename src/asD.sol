@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-only
+// SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.8.0;
 
 import {Turnstile} from "../interface/Turnstile.sol";
